@@ -1,22 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eengineer.akram@gmail.com</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        iframe { width: 100%; height: 600px; border: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="GEPCO Safety Directorate — submit and track safety reports online.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0b5c3b">
+  <title>GEPCO Safety Directorate — Safety Report Form</title>
+
+  <style>
+    :root {
+      --brand:  #0b5c3b;
+      --bg:     #f2f5f3;
+      --surface:#ffffff;
+      --text:   #10201a;
+      --muted:  #5c6b64;
+      --line:   rgba(0, 0, 0, .10);
+      --shadow: 0 8px 30px rgba(0, 0, 0, .08);
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:     #0d1411;
+        --surface:#151d1a;
+        --text:   #e7efeb;
+        --muted:  #9aada4;
+        --line:   rgba(255, 255, 255, .12);
+        --shadow: 0 8px 30px rgba(0, 0, 0, .5);
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;                 /* handles mobile URL-bar correctly */
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ---------- Header ---------- */
+    .site-header {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem 1rem;
+      flex-wrap: wrap;
+      padding: .85rem clamp(1rem, 4vw, 2rem);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .site-header h1 {
+      margin: 0;
+      font-size: clamp(1rem, 1rem + 1vw, 1.35rem);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      color: var(--brand);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .site-header h1 { color: #6fd3a6; }
+    }
+
+    .open-link {
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--brand);
+      text-decoration: none;
+      padding: .45rem .85rem;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      white-space: nowrap;
+      transition: background-color .15s ease, color .15s ease;
+    }
+    @media (prefers-color-scheme: dark) { .open-link { color: #6fd3a6; } }
+    .open-link:hover,
+    .open-link:focus-visible { background: var(--brand); color: #fff; }
+
+    /* ---------- Frame area ---------- */
+    main {
+      flex: 1 1 auto;
+      min-height: 0;                      /* lets the flex child shrink */
+      display: flex;
+      padding: clamp(.5rem, 2vw, 1.25rem);
+    }
+
+    .frame-wrap {
+      position: relative;
+      flex: 1 1 auto;
+      display: flex;
+      min-height: 60dvh;                  /* never collapses on short screens */
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .frame-wrap iframe {
+      flex: 1 1 auto;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: var(--surface);
+    }
+
+    /* ---------- Loading overlay ---------- */
+    .loader {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .85rem;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: .9rem;
+      transition: opacity .3s ease, visibility .3s ease;
+    }
+
+    .loader.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 34px;
+      height: 34px;
+      border: 3px solid var(--line);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .spinner { animation-duration: 2s; }
+      .loader { transition: none; }
+    }
+
+    /* ---------- Fallback note ---------- */
+    .fallback {
+      flex: 0 0 auto;
+      margin: 0 clamp(1rem, 4vw, 2rem) 1rem;
+      padding: .7rem 1rem;
+      font-size: .85rem;
+      text-align: center;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+    }
+    .fallback a { color: var(--brand); font-weight: 600; }
+    @media (prefers-color-scheme: dark) { .fallback a { color: #6fd3a6; } }
+    .fallback[hidden] { display: none; }
+
+    /* ---------- Print ---------- */
+    @media print {
+      body { background: #fff; }
+      .site-header, .loader, .fallback { display: none !important; }
+      .frame-wrap { box-shadow: none; border: 0; min-height: auto; }
+      .frame-wrap iframe { height: 90vh; }
+    }
+  </style>
 </head>
+
 <body>
-    <h2>GEPCO Safety Directorate</h2>
-     <iframe
-        src="https://script.google.com/macros/s/AKfycbwDrKyJQkG4tXM0B953lVRmfo23FcfMYv2UlySiV0-hbcTkUVXsg8ywMfcMCBiZcY7S/exec"
+  <header class="site-header">
+    <h1>GEPCO Safety Directorate</h1>
+    <a class="open-link"
+       href="https://script.google.com/macros/s/AKfycbwDrKyJQkG4tXM0B953lVRmfo23FcfMYv2UlySiV0-hbcTkUVXsg8ywMfcMCBiZcY7S/exec?page=form"
+       target="_blank"
+       rel="noopener noreferrer">
+      Open in new tab ↗
+    </a>
+  </header>
+
+  <main>
+    <div class="frame-wrap">
+      <div class="loader" id="loader" role="status" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="loader-text">Loading form…</span>
+      </div>
+
+      <iframe
+        id="form-frame"
+        src="https://script.google.com/macros/s/AKfycbwDrKyJQkG4tXM0B953lVRmfo23FcfMYv2UlySiV0-hbcTkUVXsg8ywMfcMCBiZcY7S/exec?page=form"
+        title="GEPCO Safety Directorate online safety report form"
         allow="geolocation; camera; microphone; clipboard-write; fullscreen"
         allowfullscreen
         referrerpolicy="no-referrer-when-downgrade"
-        loading="lazy">
-    </iframe>
+        loading="eager">
+      </iframe>
+    </div>
+  </main>
+
+  <p class="fallback" id="fallback" hidden>
+    The form is taking longer than usual to load.
+    <a href="https://script.google.com/macros/s/AKfycbwDrKyJQkG4tXM0B953lVRmfo23FcfMYv2UlySiV0-hbcTkUVXsg8ywMfcMCBiZcY7S/exec?page=form"
+       target="_blank" rel="noopener noreferrer">Open it in a new tab</a> instead.
+  </p>
+
+  <noscript>
+    <p class="fallback">
+      JavaScript is disabled, so the embedded form may not work.
+      <a href="https://script.google.com/macros/s/AKfycbwDrKyJQkG4tXM0B953lVRmfo23FcfMYv2UlySiV0-hbcTkUVXsg8ywMfcMCBiZcY7S/exec?page=form">
+        Open the form directly
+      </a>.
+    </p>
+  </noscript>
+
+  <script>
+    (function () {
+      var frame    = document.getElementById('form-frame');
+      var loader   = document.getElementById('loader');
+      var text     = document.getElementById('loader-text');
+      var fallback = document.getElementById('fallback');
+      var slowTimer;
+
+      function hideLoader() {
+        clearTimeout(slowTimer);
+        loader.classList.add('is-hidden');
+      }
+
+      frame.addEventListener('load', hideLoader);
+
+      // If the frame hasn't finished after 10s, nudge the user with a direct link.
+      slowTimer = setTimeout(function () {
+        text.textContent = 'Still loading…';
+        fallback.hidden = false;
+      }, 10000);
+    })();
+  </script>
 </body>
 </html>
